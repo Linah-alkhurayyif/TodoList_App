@@ -11,7 +11,6 @@ class ToDoListViewController: UITableViewController,ToDoAppDelegate{
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         fetchAllItems()
-     
     }
 
 
@@ -19,6 +18,7 @@ class ToDoListViewController: UITableViewController,ToDoAppDelegate{
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return todoItems.count
     }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let todotask = tableView.dequeueReusableCell(withIdentifier: "todoitem", for: indexPath) as! cellTableViewController
         let dateFormatter = DateFormatter()
@@ -26,6 +26,12 @@ class ToDoListViewController: UITableViewController,ToDoAppDelegate{
         todotask.taskitem.text = todoItems[indexPath.row].task!
         todotask.dateitem.text = dateFormatter.string(from: todoItems[indexPath.row].date!)
         todotask.notesitem.text = todoItems[indexPath.row].note!
+        if todoItems[indexPath.row].isChecked == false {
+            todotask.accessoryType = .none
+        }else{
+            todotask.accessoryType = .checkmark
+           
+        }
         return todotask
 }
     
@@ -38,11 +44,19 @@ class ToDoListViewController: UITableViewController,ToDoAppDelegate{
             print("hi \(error)")
         }
     }
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let navigationController = segue.destination as! UINavigationController
         let addItemViewController = navigationController.topViewController as! AddItemViewController
         addItemViewController.delegate = self
     }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        todoItems[indexPath.row].isChecked = !todoItems[indexPath.row].isChecked
+        tableView.reloadData()
+        saveContext()
+    }
+    
     func addItemButtonPressed(by controller: AddItemViewController, title: String, note: String, date: Date) {
         let taskItem = NSEntityDescription.insertNewObject(forEntityName: "ToDoTask", into: managedObjectContext) as! ToDoTask
         taskItem.task = title
