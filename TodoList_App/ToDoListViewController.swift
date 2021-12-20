@@ -57,6 +57,13 @@ class ToDoListViewController: UITableViewController,ToDoAppDelegate{
         saveContext()
     }
     
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        managedObjectContext.delete(todoItems[indexPath.row])
+        saveContext()
+        todoItems.remove(at: indexPath.row)
+        tableView.reloadData()
+    }
+    
     func addItemButtonPressed(by controller: AddItemViewController, title: String, note: String, date: Date) {
         let taskItem = NSEntityDescription.insertNewObject(forEntityName: "ToDoTask", into: managedObjectContext) as! ToDoTask
         taskItem.task = title
